@@ -60,4 +60,4 @@ This tool logs into edjoin.org using your own credentials and scrapes your own s
 
 ## License
 
-[MIT](LICENSE)
+Not yet decided. All rights reserved until a license is added.

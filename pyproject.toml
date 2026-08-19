@@ -1,0 +1,14 @@
+[project]
+name = "edtrawl"
+version = "0.1.0"
+description = "Find California teaching jobs within commute range of home."
+requires-python = ">=3.10"
+dependencies = [
+    "requests>=2.31",   # HTTP calls to geocoding / travel-time APIs
+    # add more as you go, e.g. an LLM client for the fuzzy name-matching step
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]

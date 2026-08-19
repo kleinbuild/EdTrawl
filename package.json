@@ -1,0 +1,13 @@
+{
+  "name": "edtrawl",
+  "version": "0.1.0",
+  "description": "Playwright scraper for edjoin.org (the Node half of EdTrawl).",
+  "type": "module",
+  "scripts": {
+    "login": "node scraper/capture_login.js",
+    "search": "node scraper/search_edjoin.js"
+  },
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}

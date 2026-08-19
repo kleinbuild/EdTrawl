@@ -1,0 +1,45 @@
+# --- Secrets / anything that means "logged in as you" ---
+auth_state.json
+.env
+.env.*
+!.env.example
+
+# --- Database & scraper output (regenerable; may hold address data) ---
+data/*.db
+data/*.db-journal
+data/*.db-wal
+data/raw/*
+!data/raw/.gitkeep
+discovery.html
+results.csv
+
+# --- Reference CSVs (large, downloadable from CDE; see README) ---
+data/reference/*.csv
+
+# --- Personal data ---
+data/reference/districts.csv
+
+# --- Playwright run artifacts (screenshots, traces, snapshots) ---
+artifacts/*
+!artifacts/.gitkeep
+test-results/
+playwright-report/
+playwright/.cache/
+
+# --- Node ---
+node_modules/
+npm-debug.log*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/

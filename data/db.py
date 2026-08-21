@@ -40,6 +40,7 @@ def get_connection() -> sqlite3.Connection:
        every time. Forgetting it is one of the most common SQLite surprises.
     """
     conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
@@ -66,29 +67,30 @@ SCHEMA = [
 
     """
     CREATE TABLE IF NOT EXISTS schools (
-        cds_code       TEXT PRIMARY KEY,
-        fed_id         TEXT,
-        district_code  TEXT,
-        school_code    TEXT,
-        region         TEXT,
-        county_name    TEXT,
-        district_name  TEXT,
-        school_name    TEXT,
-        school_type    TEXT,
-        open_date      TEXT,
-        school_level   TEXT,
-        grade_low      TEXT,
-        grade_high     TEXT,
-        charter        TEXT,
-        charter_num    TEXT,
-        street         TEXT,
-        city           TEXT,
-        zip            TEXT,
-        state          TEXT,
-        locale         TEXT,
-        school_website TEXT,
-        latitude       REAL,
-        longitude      REAL
+        cds_code          TEXT PRIMARY KEY,
+        academic_year     TEXT
+        fed_id            TEXT,
+        district_code     TEXT,
+        school_code       TEXT,
+        region            TEXT,
+        county_name       TEXT,
+        district_name     TEXT,
+        school_name       TEXT,
+        school_type       TEXT,
+        open_date         TEXT,
+        school_level      TEXT,
+        grade_low         TEXT,
+        grade_high        TEXT,
+        charter           TEXT,
+        charter_num       TEXT,
+        street            TEXT,
+        city              TEXT,
+        zip               TEXT,
+        state             TEXT,
+        locale            TEXT,
+        school_website    TEXT,
+        latitude          REAL,  
+        longitude         REAL,
     );
     """,
 
@@ -154,8 +156,10 @@ SCHEMA = [
         staff_admin             INTEGER,
         staff_pupil_svcs        INTEGER,
         staff_other             INTEGER,
+        snapshot_row_updated    DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (cds_code, academic_year),
         FOREIGN KEY (cds_code) REFERENCES schools(cds_code)
+        
     );
     """,
 
@@ -212,64 +216,60 @@ def init_db() -> None:
 #         row = conn.execute(sql, (name, address, lat, lng)).fetchone()
 #         return row["id"]
 
-   SCHOOL_COLUMNS = [
-        "cds_code", "fed_id", "district_code", "school_code", "region", "county_name", 
+SCHOOL_COLUMNS = [
+        "academic_year", "fed_id", "cds_code", "district_code", "school_code", "region", "county_name", 
         "district_name", "school_name", "school_type", "open_date", "school_level", 
         "grade_low", "grade_high", "charter", "charter_num", "street", "city", "zip", 
-        "state", "locale", "school_website", "latitude", "longitude",
+        "state", "locale", "school_website", "latitude", "longitude", 
     ]
 
-    SCHOOL_SNAPSHOT_COLUMNS = [] #complete this
+SCHOOL_SNAPSHOT_COLUMNS = [
+        "cds_code", "academic_year", "charter_fund_type", "virtual", "magnet", "title_i", "dass", "essa", "enroll_total", "african_amer", "african_amer_pct", "amer_indian", "amer_indian_pct", "asian", "asian_pct", "filipino", "filipino_pct", "hispanic", "hispanic_pct", "pac_islander", "pac_islander_pct", "white", "white_pct", "two_or_more_races", "two_or_more_races_pct", "not_reported", "not_reported_pct", "english_learner", "english_learner_pct", "foster", "foster_pct", "homeless", "homeless_pct", "migrant", "migrant_pct", "soc_disadvantaged", "soc_disadvantaged_pct", "students_with_dis", "students_with_dis_pct", "free_reduced_meal", "free_reduced_meal_pct", "grade_tk", "grade_kg", "grade_01", "grade_02", "grade_03", "grade_04",("grade_05"),("grade_06"),("grade_07"),("grade_08"),("grade_09"),("grade_10"),("grade_11"),("grade_12"),("staff_total"),("staff_teachers"),("staff_admin"),("staff_pupil_svcs"),("staff_other")
+    ] #complete this
 
-def upsert_schools() -> 
-    # TODO finish this 
+
+def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code: str, school_code: str, region: str, county_name: str, district_name: str, school_name: str, school_type: str, open_date: str, school_level: str, grade_low: str, grade_high: str, charter_num: str, street: str, city: str, zip: str, state: str, locale: str, school_website: str | None = None, latitude: float | None = None, longitude: float | None = None) -> int:
     
-    """Insert or update a school, return its id.
-
-    # TODO(you): write this by mirroring upsert_district().
-    # Differences to work out:
-    #   - There are more columns to insert (district_id too).
-    #   - The UNIQUE constraint here is on TWO columns: (district_id, name).
-    #     How do you write ON CONFLICT for a two-column unique constraint?
-    #     (Hint: ON CONFLICT(district_id, name) DO UPDATE SET ...)
-    #   - Which columns do you want to COALESCE so you don't clobber existing
-    #     geocoded coordinates?
-"""
-
 #do I want to keep the detailed list of excluded. items or refactor to a loop? 
 #pros refactor: cleaner, leaner code, more maintainable
 #con refactor: Being a beginner programmer, I'm more likely to make mistakes with the loop.
 #con focusing on mastering this loop may slow down other critical parts of development.
 #decision: after completing the needed function after the SQL, see about this part.
     SQL = """
-        INSERT INTO schools (cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)
+        INSERT INTO schools (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT (cds_code) DO UPDATE SET
-            fed_id         = excluded.fed_id,
-            district_code  = excluded.district_code,
-            school_code    = excluded.school_code,
-            region         = excluded.region,
-            county_name    = excluded.county_name,
-            district_name  = excluded.district_name,
-            school_name    = excluded.school_name,
-            school_type    = excluded.school_type,
-            open_date      = excluded.open_date,
-            school_level   = excluded.school_level,
-            grade_low      = excluded.grade_low,
-            grade_high     = excluded.grade_high,
-            charter        = excluded.charter,
-            charter_num    = excluded.charter_num,
-            street         = excluded.street,
-            city           = excluded.city,
-            zip            = excluded.zip,
-            state          = excluded.state,
-            locale         = excluded.locale,
-            school_website = excluded.school_website,
-            latitude = COALESCE(excluded.latitude, schools.latitude),
-            longitude = COALESCE(excluded.longitude, schools.longitude);
-        """
-            
-#put ending of upsert_schools here
+        ON CONFLICT (cds_code) DO 
+        UPDATE
+        SET
+          academic_year  = excluded.academic_year
+          fed_id         = excluded.fed_id,
+          district_code  = excluded.district_code,
+          school_code    = excluded.school_code,
+          region         = excluded.region,
+          county_name    = excluded.county_name,
+          district_name  = excluded.district_name,
+          school_name    = excluded.school_name,
+          school_type    = excluded.school_type,
+          open_date      = excluded.open_date,
+          school_level   = excluded.school_level,
+          grade_low      = excluded.grade_low,
+          grade_high     = excluded.grade_high,
+          charter        = excluded.charter,
+          charter_num    = excluded.charter_num,
+          street         = excluded.street,
+          city           = excluded.city,
+          zip            = excluded.zip,
+          state          = excluded.state,
+          locale         = excluded.locale,
+          school_website = excluded.school_website,
+          latitude = COALESCE(excluded.latitude, schools.latitude),
+          longitude = COALESCE(excluded.longitude, schools.longitude);
+        WHERE excluded.academic_year > schools.academic_year;
+        
+    """
+with get_connection() as conn:
+    row = con.execute(SQL, (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)).fetchone()
+
 
 
 def upsert_schools_snapshots() # todo complete this
@@ -277,8 +277,9 @@ def upsert_schools_snapshots() # todo complete this
     SQL = """
         INSERT INTO schools_snapshots (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(cds_code) DO UPDATE SET
-        ON CONFLICT(academic_year) DO NOTHING
+        ON CONFLICT(cds_code) DO 
+        UPDATE 
+        SET
             cds_code                
             academic_year           
             charter_fund_type       
@@ -340,8 +341,12 @@ def upsert_schools_snapshots() # todo complete this
             staff_pupil_svcs        
             staff_other             
 
-"""
+            """
 
+
+data: tuple[Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown] = (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
+
+row = cursor.execute(sql, data)
 
 #put ending of upsert_schools_snapshots here
 

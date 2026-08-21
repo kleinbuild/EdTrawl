@@ -31,7 +31,7 @@ notes/               Learning notes and project plan
 
 ## Reference data
 
-The school data comes from CDE's "California Public Schools" file on [data.ca.gov](https://data.ca.gov/dataset/california-school-directory/resource/798ff104-de68-4a5e-95b2-6da38833bd9b). Download the CSV and place it in `data/reference/`. These files are `.gitignored` because they're large (~5 MB) and freely available from the source.
+The school data comes from CDE's "California Public Schools" file on [data.ca.gov](https://data.ca.gov/dataset/california-public-schools-2025-26)). Download the CSV and place it in `data/reference/`. These files are `.gitignored` because they're large (~5 MB) and freely available from the source.
 
 ## Setup
 

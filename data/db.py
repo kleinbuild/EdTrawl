@@ -68,7 +68,7 @@ SCHEMA = [
     """
     CREATE TABLE IF NOT EXISTS schools (
         cds_code          TEXT PRIMARY KEY,
-        academic_year     TEXT
+        academic_year     TEXT,
         fed_id            TEXT,
         district_code     TEXT,
         school_code       TEXT,
@@ -90,7 +90,7 @@ SCHEMA = [
         locale            TEXT,
         school_website    TEXT,
         latitude          REAL,  
-        longitude         REAL,
+        longitude         REAL
     );
     """,
 
@@ -220,15 +220,12 @@ SCHOOL_COLUMNS = [
         "academic_year", "fed_id", "cds_code", "district_code", "school_code", "region", "county_name", 
         "district_name", "school_name", "school_type", "open_date", "school_level", 
         "grade_low", "grade_high", "charter", "charter_num", "street", "city", "zip", 
-        "state", "locale", "school_website", "latitude", "longitude", 
+        "state", "locale", "school_website", "latitude", "longitude" 
     ]
 
-SCHOOL_SNAPSHOT_COLUMNS = [
-        "cds_code", "academic_year", "charter_fund_type", "virtual", "magnet", "title_i", "dass", "essa", "enroll_total", "african_amer", "african_amer_pct", "amer_indian", "amer_indian_pct", "asian", "asian_pct", "filipino", "filipino_pct", "hispanic", "hispanic_pct", "pac_islander", "pac_islander_pct", "white", "white_pct", "two_or_more_races", "two_or_more_races_pct", "not_reported", "not_reported_pct", "english_learner", "english_learner_pct", "foster", "foster_pct", "homeless", "homeless_pct", "migrant", "migrant_pct", "soc_disadvantaged", "soc_disadvantaged_pct", "students_with_dis", "students_with_dis_pct", "free_reduced_meal", "free_reduced_meal_pct", "grade_tk", "grade_kg", "grade_01", "grade_02", "grade_03", "grade_04",("grade_05"),("grade_06"),("grade_07"),("grade_08"),("grade_09"),("grade_10"),("grade_11"),("grade_12"),("staff_total"),("staff_teachers"),("staff_admin"),("staff_pupil_svcs"),("staff_other")
-    ] #complete this
 
 
-def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code: str, school_code: str, region: str, county_name: str, district_name: str, school_name: str, school_type: str, open_date: str, school_level: str, grade_low: str, grade_high: str, charter_num: str, street: str, city: str, zip: str, state: str, locale: str, school_website: str | None = None, latitude: float | None = None, longitude: float | None = None) -> int:
+def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code: str, school_code: str, region: str, county_name: str, district_name: str, school_name: str, school_type: str, open_date: str, school_level: str, grade_low: str, grade_high: str, charter: str, charter_num: str, street: str, city: str, zip: str, state: str, locale: str, school_website: str | None = None, latitude: float | None = None, longitude: float | None = None) -> int:
     
 #do I want to keep the detailed list of excluded. items or refactor to a loop? 
 #pros refactor: cleaner, leaner code, more maintainable
@@ -237,11 +234,11 @@ def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code
 #decision: after completing the needed function after the SQL, see about this part.
     SQL = """
         INSERT INTO schools (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT (cds_code) DO 
-        UPDATE
+        UPDATE  
         SET
-          academic_year  = excluded.academic_year
+          academic_year  = excluded.academic_year,
           fed_id         = excluded.fed_id,
           district_code  = excluded.district_code,
           school_code    = excluded.school_code,
@@ -263,14 +260,39 @@ def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code
           locale         = excluded.locale,
           school_website = excluded.school_website,
           latitude = COALESCE(excluded.latitude, schools.latitude),
-          longitude = COALESCE(excluded.longitude, schools.longitude);
-        WHERE excluded.academic_year > schools.academic_year;
+          longitude = COALESCE(excluded.longitude, schools.longitude)
+        WHERE excluded.academic_year > schools.academic_year
+        RETURNING cds_code;
         
     """
-with get_connection() as conn:
-    row = con.execute(SQL, (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)).fetchone()
+    with get_connection() as conn:
+        row = conn.execute(SQL, (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)).fetchone()
+        return row ["cds_code"]
+ 
 
+SCHOOL_SNAPSHOT_COLUMNS = [
+        "cds_code", "academic_year", "charter_fund_type", "virtual", "magnet", "title_i", "dass", "essa", "enroll_total", "african_amer", "african_amer_pct", "amer_indian", "amer_indian_pct", "asian", "asian_pct", "filipino", "filipino_pct", "hispanic", "hispanic_pct", "pac_islander", "pac_islander_pct", "white", "white_pct", "two_or_more_races", "two_or_more_races_pct", "not_reported", "not_reported_pct", "english_learner", "english_learner_pct", "foster", "foster_pct", "homeless", "homeless_pct", "migrant", "migrant_pct", "soc_disadvantaged", "soc_disadvantaged_pct", "students_with_dis", "students_with_dis_pct", "free_reduced_meal", "free_reduced_meal_pct", "grade_tk", "grade_kg", "grade_01", "grade_02", "grade_03", "grade_04","grade_05","grade_06","grade_07","grade_08","grade_09","grade_10","grade_11","grade_12","staff_total","staff_teachers","staff_admin","staff_pupil_svcs","staff_other"
+    ] 
 
+#",".join(f"{SCHOOL_SNAPSHOT_COLUMN}:")
+
+snapshot_types={col: "str" for col in SCHOOL_SNAPSHOT_COLUMNS}
+snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "int" for i in [8, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39]})
+snapshot_types.update({col: "int" for col in SCHOOL_SNAPSHOT_COLUMNS[41: 60]})
+snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "float" for i in [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]})
+
+def upsert_schools_snapshots()
+    cols         = ", ".join(SCHOOL_SNAPSHOT_COLUMNS)
+    placeholders = ", ".join("?" * len(SCHOOL_SNAPSHOT_COLUMNS))
+    updates      = ", ".join(
+                       f"{col} = excluded.{col}"
+                       for col in SCHOOL_SNAPSHOT_COLUMNS
+                       if col != "cds_code"
+                    )
+    SQL = f"""
+        INSERT INTO SCHOOL_SNAPSHOT_COLUMNS ({cols})
+        VALUES ({placeholders})
+        ON CONFLICT(cds_code, academic_year) DO NOTHING
 
 def upsert_schools_snapshots() # todo complete this
 #below get rid of the column names for ON Conflict and replace with loop. 

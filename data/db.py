@@ -280,8 +280,9 @@ snapshot_types={col: "str" for col in SCHOOL_SNAPSHOT_COLUMNS}
 snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "int" for i in [8, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39]})
 snapshot_types.update({col: "int" for col in SCHOOL_SNAPSHOT_COLUMNS[41: 60]})
 snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "float" for i in [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]})
+snapshot_params = ", ".join(f"{SCHOOL_SNAPSHOT_COLUMN}: {snapshot_types[SCHOOL_SNAPSHOT_COLUMNS]}" for SCHOOL_SNAPSHOT_COLUMN in SCHOOL_SNAPSHOT_COLUMNS)
 
-def upsert_schools_snapshots()
+def upsert_schools_snapshots(snapshot_params):
     cols         = ", ".join(SCHOOL_SNAPSHOT_COLUMNS)
     placeholders = ", ".join("?" * len(SCHOOL_SNAPSHOT_COLUMNS))
     updates      = ", ".join(

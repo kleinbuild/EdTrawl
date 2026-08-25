@@ -219,14 +219,14 @@ def upsert_schools_snapshots(data: tuple) -> None:
         ON CONFLICT(cds_code, academic_year) DO NOTHING
     """
     with get_connection() as conn:
-        row = conn.execute(SQL, (", ".join(SCHOOL_SNAPSHOT_COLUMNS)))
+        row = conn.execute(SQL, data)
 
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.
     # As you complete the TODOs, add quick test calls here to check them, e.g.:
     #     init_db()
     #     did = upsert_district("Whittier Union High School District")
-    #     print("district id:", did)a
+    #     print("district id:", did)
     init_db()
 
 # move a copy of this list over to the ingest so I can see the data order clearly in both 

@@ -2,6 +2,8 @@
 
 import csv
 from csv import DictReader
+from data import upsert_schools
+from data import upsert_schools_snapshots
 
 schools_header_map = {
     "CDS Code": "cds_code", 
@@ -93,12 +95,12 @@ schools_snapshots_header_map = {
 }
 
 
-with open('placeholder_name.csv', newline='', encoding='utf-8') as f:
+with open('25_26.csv', newline='', encoding='utf-8') as f:
     reader = csv.DictReader(f, fieldnames=None, restkey=None, restval=None, dialect='excel')
     for row in reader:
         print(row)
 
-
+upsert_schools()
 try:
     for row in csv.DictReader(f):
         clean_schools_row = {schools_header_map[k]: v for k, v in row.items()}
@@ -106,9 +108,10 @@ try:
 except:
     print("error in using school_headers_map to create clean header row key for schools on ingest")
 
-    try:
-        for row in csv.DictReader(f):
-            clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items()}
+upsert_schools_snapshots()
+try:
+    for row in csv.DictReader(f):
+        clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items()}
 
-    except:
-        print("error in using schools_snapshots_headers_map to create clean header row key for schools snapshots table on ingest")
+except:
+    print("error in using schools_snapshots_headers_map to create clean header row key for schools snapshots table on ingest")

@@ -290,80 +290,83 @@ def upsert_schools_snapshots(snapshot_params):
         INSERT INTO schools_snapshots ({cols})
         VALUES ({placeholders})
         ON CONFLICT(cds_code, academic_year) DO NOTHING
-
-def upsert_schools_snapshots() # todo complete this
-#below get rid of the column names for ON Conflict and replace with loop. 
-    SQL = """
-        INSERT INTO schools_snapshots (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(cds_code) DO 
-        UPDATE 
-        SET
-            cds_code                
-            academic_year           
-            charter_fund_type       
-            virtual                 
-            magnet                  
-            title_i                 
-            dass                    
-            essa                    
-            enroll_total            
-            african_amer            
-            african_amer_pct        
-            amer_indian             
-            amer_indian_pct         
-            asian                   
-            asian_pct               
-            filipino                
-            filipino_pct                     
-            hispanic                
-            hispanic_pct            
-            pac_islander            
-            pac_islander_pct        
-            white                   
-            white_pct               
-            two_or_more_races       
-            two_or_more_races_pct   
-            not_reported            
-            not_reported_pct        
-            english_learner         
-            english_learner_pct     
-            foster                  
-            foster_pct              
-            homeless                
-            homeless_pct            
-            migrant                 
-            migrant_pct             
-            soc_disadvantaged       
-            soc_disadvantaged_pct   
-            students_with_dis       
-            students_with_dis_pct   
-            free_reduced_meal       
-            free_reduced_meal_pct   
-            grade_tk                
-            grade_kg                
-            grade_01                
-            grade_02                
-            grade_03                
-            grade_04                
-            grade_05                
-            grade_06                           
-            grade_07                
-            grade_08                
-            grade_09                
-            grade_10                
-            grade_11                
-            grade_12                
-            staff_total             
-            staff_teachers          
-            staff_admin             
-            staff_pupil_svcs        
-            staff_other             
-
-            """
+    """
+    with get_connection() as conn:
+        row = conn.execute(SQL, (", ".join(SCHOOL_SNAPSHOT_COLUMNS))).fetchone()
+        return row ["cds_code", "academic_year"]
 
 
-data: tuple[Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown, Unknown] = (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
+    # SQL = """
+    #     INSERT INTO schools_snapshots (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
+    #     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        # ON CONFLICT(cds_code) DO 
+        # UPDATE 
+        # SET
+        #     cds_code                
+        #     academic_year           
+        #     charter_fund_type       
+        #     virtual                 
+        #     magnet                  
+        #     title_i                 
+        #     dass                    
+        #     essa                    
+        #     enroll_total            
+        #     african_amer            
+        #     african_amer_pct        
+        #     amer_indian             
+        #     amer_indian_pct         
+        #     asian                   
+        #     asian_pct               
+        #     filipino                
+        #     filipino_pct                     
+        #     hispanic                
+        #     hispanic_pct            
+        #     pac_islander            
+        #     pac_islander_pct        
+        #     white                   
+        #     white_pct               
+        #     two_or_more_races       
+        #     two_or_more_races_pct   
+        #     not_reported            
+        #     not_reported_pct        
+        #     english_learner         
+        #     english_learner_pct     
+        #     foster                  
+        #     foster_pct              
+        #     homeless                
+        #     homeless_pct            
+        #     migrant                 
+        #     migrant_pct             
+        #     soc_disadvantaged       
+        #     soc_disadvantaged_pct   
+        #     students_with_dis       
+        #     students_with_dis_pct   
+        #     free_reduced_meal       
+        #     free_reduced_meal_pct   
+        #     grade_tk                
+        #     grade_kg                
+        #     grade_01                
+        #     grade_02                
+        #     grade_03                
+        #     grade_04                
+        #     grade_05                
+        #     grade_06                           
+        #     grade_07                
+        #     grade_08                
+        #     grade_09                
+        #     grade_10                
+        #     grade_11                
+        #     grade_12                
+        #     staff_total             
+        #     staff_teachers          
+        #     staff_admin             
+        #     staff_pupil_svcs        
+        #     staff_other             
+
+        #     """
+
+
+# data: tuple[cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other]
 
 row = cursor.execute(sql, data)
 

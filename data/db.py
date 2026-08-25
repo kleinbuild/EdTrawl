@@ -1,20 +1,10 @@
-#  """
 # db.py — SQLite layer for EdTrawl.
 
 # Tables (see SCHEMA below):
-#     schools        - one row per school, linked to its district
-#     schools_snapshots - annual updates of variable data
-#     travel_times   - cached minutes from home, per school (the expensive cache)
+#     schools        - one row per school, linked to its district DONE
+#     schools_snapshots - annual updates of variable data  DONE
+#     travel_times   - cached minutes from home, per school (the expensive cache) 
 #     jobs           - job listings, linked to a school
-
-# ------------------------------------------------------------------------------
-# HOW TO WORK THROUGH THIS FILE
-# The districts table and upsert_district() are complete worked (depreciated)
-# examples. Wherever you see  # TODO(you):  a piece is left for you to write by
-# mirroring the completed example above it. Fill those in, then run this file
-# directly (`python db.py`) to create the database and confirm it works.
-# ------------------------------------------------------------------------------
-# """
 
 import sqlite3
 from pathlib import Path
@@ -45,7 +35,6 @@ def get_connection() -> sqlite3.Connection:
     conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
-
 # -----------------------------------------------------------------------------
 # SCHEMA
 # Each table is its own CREATE statement. "IF NOT EXISTS" makes init_db()
@@ -53,19 +42,7 @@ def get_connection() -> sqlite3.Connection:
 # -----------------------------------------------------------------------------
 
 SCHEMA = [
-    # --- districts: the worked example. Study this one. ---
-    # """
-    # CREATE TABLE IF NOT EXISTS districts (
-    #     id       INTEGER PRIMARY KEY,        -- SQLite auto-assigns if left NULL
-    #     name     TEXT NOT NULL UNIQUE,       -- UNIQUE lets us UPSERT on name
-    #     address  TEXT,
-    #     lat      REAL,                       -- REAL = floating point
-    #     lng      REAL
-    # );
-    # """,
-
-
-    """
+       """
     CREATE TABLE IF NOT EXISTS schools (
         cds_code          TEXT PRIMARY KEY,
         academic_year     TEXT,
@@ -162,10 +139,7 @@ SCHEMA = [
         
     );
     """,
-
-
 ]
-
 
 def init_db() -> None:
     """Create every table. Safe to run as many times as you like."""
@@ -177,44 +151,12 @@ def init_db() -> None:
                 conn.executescript(statement)
     print(f"Initialized database at {DB_PATH}")
 
-
 # -----------------------------------------------------------------------------
 # WRITES
 # Note every query uses  ?  placeholders instead of f-strings / string
 # concatenation. This is parameterization: the driver handles quoting and makes
 # SQL injection impossible. Get in the habit now even for a personal tool.
 # -----------------------------------------------------------------------------
-
-# def upsert_district(name: str, address: str | None = None,
-#                     lat: float | None = None, lng: float | None = None) -> int:
-#     """Insert a district, or update it if the name already exists. Returns its id.
-
-#     This is the worked example for the UPSERT pattern. Read it closely:
-
-#     INSERT ... ON CONFLICT(name) DO UPDATE SET ...
-#         - Tries to INSERT a new row.
-#         - If a row with the same `name` already exists (that's the "conflict",
-#           and it only works because `name` is declared UNIQUE in the schema),
-#           it runs the UPDATE instead of erroring.
-#         - `excluded.address` refers to the value we *tried* to insert — so this
-#           says "overwrite the stored address with the new one."
-
-#     The COALESCE trick: `COALESCE(excluded.lat, districts.lat)` means "use the
-#     new lat if it isn't NULL, otherwise keep the existing one." That way calling
-#     this with just a name doesn't wipe out coordinates you already geocoded.
-#     """
-#     sql = """
-#         INSERT INTO districts (name, address, lat, lng)
-#         VALUES (?, ?, ?, ?)
-#         ON CONFLICT(name) DO UPDATE SET
-#             address = COALESCE(excluded.address, districts.address),
-#             lat     = COALESCE(excluded.lat,     districts.lat),
-#             lng     = COALESCE(excluded.lng,     districts.lng)
-#         RETURNING id;
-#     """
-#     with get_connection() as conn:
-#         row = conn.execute(sql, (name, address, lat, lng)).fetchone()
-#         return row["id"]
 
 SCHOOL_COLUMNS = [
         "academic_year", "fed_id", "cds_code", "district_code", "school_code", "region", "county_name", 
@@ -223,15 +165,8 @@ SCHOOL_COLUMNS = [
         "state", "locale", "school_website", "latitude", "longitude" 
     ]
 
-
-
 def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code: str, school_code: str, region: str, county_name: str, district_name: str, school_name: str, school_type: str, open_date: str, school_level: str, grade_low: str, grade_high: str, charter: str, charter_num: str, street: str, city: str, zip: str, state: str, locale: str, school_website: str | None = None, latitude: float | None = None, longitude: float | None = None) -> int:
     
-#do I want to keep the detailed list of excluded. items or refactor to a loop? 
-#pros refactor: cleaner, leaner code, more maintainable
-#con refactor: Being a beginner programmer, I'm more likely to make mistakes with the loop.
-#con focusing on mastering this loop may slow down other critical parts of development.
-#decision: after completing the needed function after the SQL, see about this part.
     SQL = """
         INSERT INTO schools (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -274,15 +209,7 @@ SCHOOL_SNAPSHOT_COLUMNS = [
         "cds_code", "academic_year", "charter_fund_type", "virtual", "magnet", "title_i", "dass", "essa", "enroll_total", "african_amer", "african_amer_pct", "amer_indian", "amer_indian_pct", "asian", "asian_pct", "filipino", "filipino_pct", "hispanic", "hispanic_pct", "pac_islander", "pac_islander_pct", "white", "white_pct", "two_or_more_races", "two_or_more_races_pct", "not_reported", "not_reported_pct", "english_learner", "english_learner_pct", "foster", "foster_pct", "homeless", "homeless_pct", "migrant", "migrant_pct", "soc_disadvantaged", "soc_disadvantaged_pct", "students_with_dis", "students_with_dis_pct", "free_reduced_meal", "free_reduced_meal_pct", "grade_tk", "grade_kg", "grade_01", "grade_02", "grade_03", "grade_04","grade_05","grade_06","grade_07","grade_08","grade_09","grade_10","grade_11","grade_12","staff_total","staff_teachers","staff_admin","staff_pupil_svcs","staff_other"
     ] 
 
-#",".join(f"{SCHOOL_SNAPSHOT_COLUMN}:")
-
-snapshot_types={col: "str" for col in SCHOOL_SNAPSHOT_COLUMNS}
-snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "int" for i in [8, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39]})
-snapshot_types.update({col: "int" for col in SCHOOL_SNAPSHOT_COLUMNS[41: 60]})
-snapshot_types.update({SCHOOL_SNAPSHOT_COLUMNS[i]: "float" for i in [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]})
-snapshot_params = ", ".join(f"{SCHOOL_SNAPSHOT_COLUMN}: {snapshot_types[SCHOOL_SNAPSHOT_COLUMN]}" for SCHOOL_SNAPSHOT_COLUMN in SCHOOL_SNAPSHOT_COLUMNS)
-
-def upsert_schools_snapshots(snapshot_params):
+def upsert_schools_snapshots(data: tuple) -> None:
     cols         = ", ".join(SCHOOL_SNAPSHOT_COLUMNS)
     placeholders = ", ".join("?" * len(SCHOOL_SNAPSHOT_COLUMNS))
     
@@ -292,93 +219,15 @@ def upsert_schools_snapshots(snapshot_params):
         ON CONFLICT(cds_code, academic_year) DO NOTHING
     """
     with get_connection() as conn:
-        row = conn.execute(SQL, (", ".join(SCHOOL_SNAPSHOT_COLUMNS))).fetchone()
-        return row ["cds_code", "academic_year"]
-
-
-    # SQL = """
-    #     INSERT INTO schools_snapshots (cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other)
-    #     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        # ON CONFLICT(cds_code) DO 
-        # UPDATE 
-        # SET
-        #     cds_code                
-        #     academic_year           
-        #     charter_fund_type       
-        #     virtual                 
-        #     magnet                  
-        #     title_i                 
-        #     dass                    
-        #     essa                    
-        #     enroll_total            
-        #     african_amer            
-        #     african_amer_pct        
-        #     amer_indian             
-        #     amer_indian_pct         
-        #     asian                   
-        #     asian_pct               
-        #     filipino                
-        #     filipino_pct                     
-        #     hispanic                
-        #     hispanic_pct            
-        #     pac_islander            
-        #     pac_islander_pct        
-        #     white                   
-        #     white_pct               
-        #     two_or_more_races       
-        #     two_or_more_races_pct   
-        #     not_reported            
-        #     not_reported_pct        
-        #     english_learner         
-        #     english_learner_pct     
-        #     foster                  
-        #     foster_pct              
-        #     homeless                
-        #     homeless_pct            
-        #     migrant                 
-        #     migrant_pct             
-        #     soc_disadvantaged       
-        #     soc_disadvantaged_pct   
-        #     students_with_dis       
-        #     students_with_dis_pct   
-        #     free_reduced_meal       
-        #     free_reduced_meal_pct   
-        #     grade_tk                
-        #     grade_kg                
-        #     grade_01                
-        #     grade_02                
-        #     grade_03                
-        #     grade_04                
-        #     grade_05                
-        #     grade_06                           
-        #     grade_07                
-        #     grade_08                
-        #     grade_09                
-        #     grade_10                
-        #     grade_11                
-        #     grade_12                
-        #     staff_total             
-        #     staff_teachers          
-        #     staff_admin             
-        #     staff_pupil_svcs        
-        #     staff_other             
-
-        #     """
-
-
-# data: tuple[cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other]
-
-row = cursor.execute(sql, data)
-
-#put ending of upsert_schools_snapshots here
-
-
-
+        row = conn.execute(SQL, (", ".join(SCHOOL_SNAPSHOT_COLUMNS)))
 
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.
     # As you complete the TODOs, add quick test calls here to check them, e.g.:
     #     init_db()
     #     did = upsert_district("Whittier Union High School District")
-    #     print("district id:", did)
+    #     print("district id:", did)a
     init_db()
+
+# move a copy of this list over to the ingest so I can see the data order clearly in both 
+# data: tuple[cds_code, academic_year, charter_fund_type, virtual, magnet, title_i, dass, essa, enroll_total, african_amer, african_amer_pct, amer_indian, amer_indian_pct, asian, asian_pct, filipino, filipino_pct, hispanic, hispanic_pct, pac_islander, pac_islander_pct, white, white_pct, two_or_more_races, two_or_more_races_pct, not_reported, not_reported_pct, english_learner, english_learner_pct, foster, foster_pct, homeless, homeless_pct, migrant, migrant_pct, soc_disadvantaged, soc_disadvantaged_pct, students_with_dis, students_with_dis_pct, free_reduced_meal, free_reduced_meal_pct, grade_tk, grade_kg, grade_01, grade_02, grade_03, grade_04, grade_05, grade_06, grade_07, grade_08, grade_09, grade_10, grade_11, grade_12, staff_total, staff_teachers, staff_admin, staff_pupil_svcs, staff_other]

@@ -8,6 +8,7 @@ auth_state.json
 data/*.db
 data/*.db-journal
 data/*.db-wal
+data/*.csv
 data/raw/*
 !data/raw/.gitkeep
 discovery.html

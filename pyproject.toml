@@ -6,6 +6,7 @@ requires-python = ">=3.10"
 dependencies = [
     "requests>=2.31",   # HTTP calls to geocoding / travel-time APIs
     # add more as you go, e.g. an LLM client for the fuzzy name-matching step
+    "playwright>=1.40",
 ]
 
 [project.optional-dependencies]

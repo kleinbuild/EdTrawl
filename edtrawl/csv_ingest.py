@@ -2,8 +2,8 @@
 
 import csv
 from csv import DictReader
-from data import upsert_schools
-from data import upsert_schools_snapshots
+from edtrawl.db import upsert_schools
+from edtrawl.db import upsert_schools_snapshots
 
 schools_header_map = {
     "CDS Code": "cds_code", 

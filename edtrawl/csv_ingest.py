@@ -6,6 +6,7 @@ from edtrawl.db import upsert_schools
 from edtrawl.db import upsert_schools_snapshots
 
 schools_header_map = {
+    "Academic Year": "academic_year",
     "CDS Code": "cds_code", 
     "Fed ID": "fed_id",
     "District Code": "district_code",
@@ -95,17 +96,17 @@ schools_snapshots_header_map = {
 }
 
 
-with open('25_26.csv', newline='', encoding='utf-8') as f:
+with open('25_26.csv', newline='', encoding='utf-8-sig') as f:
     for row in csv.DictReader(f):
         try:
-            clean_schools_row = {schools_header_map[k]: v for k, v in row.items()}
+            clean_schools_row = {schools_header_map[k]: v for k, v in row.items() if k in schools_snapshots_header_map}
             upsert_schools(**clean_schools_row)
         except Exception as e:
             print(f"Error on row {e}")
             print(f"Row data: {row}")
 
         try:
-            clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items()}
+            clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items() if k in schools_snapshots_header_map}
             upsert_schools_snapshots(**clean_snapshots_row)
         except Exception as e:
             print(f"Error on row {e}")

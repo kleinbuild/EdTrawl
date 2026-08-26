@@ -102,12 +102,12 @@ with open('25_26.csv', newline='', encoding='utf-8') as f:
             upsert_schools(**clean_schools_row)
         except Exception as e:
             print(f"Error on row {e}")
-            print(f"Row data: {clean_schools_row}")
+            print(f"Row data: {row}")
 
         try:
             clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items()}
             upsert_schools_snapshots(**clean_snapshots_row)
-        except Exception as g:
-            print(f"Error on row {g}")
-            print(f"Row data: {clean_snapshots_row}")
+        except Exception as e:
+            print(f"Error on row {e}")
+            print(f"Row data: {row}")
 

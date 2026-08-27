@@ -202,7 +202,7 @@ def upsert_schools(academic_year: str, cds_code: str, fed_id: str, district_code
     """
     with get_connection() as conn:
         row = conn.execute(SQL, (academic_year, cds_code, fed_id, district_code, school_code, region, county_name, district_name, school_name, school_type, open_date, school_level, grade_low, grade_high, charter, charter_num, street, city, zip, state, locale, school_website, latitude, longitude)).fetchone()
-        return row ["cds_code"]
+        return row ["cds_code"] if row else cds_code
  
 
 SCHOOL_SNAPSHOT_COLUMNS = [

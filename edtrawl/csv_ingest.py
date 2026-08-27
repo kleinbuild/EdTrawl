@@ -48,7 +48,7 @@ schools_snapshots_header_map = {
     "American Indian": "amer_indian",             
     "American Indian (%)": "amer_indian_pct",      
     "Asian": "asian",                   
-    "Asian(%)": "asian_pct",            
+    "Asian (%)": "asian_pct",            
     "Filipino": "filipino",                
     "Filipino (%)": "filipino_pct",                     
     "Hispanic": "hispanic",                

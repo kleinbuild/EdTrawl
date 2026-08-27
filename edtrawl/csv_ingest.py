@@ -4,6 +4,7 @@ import csv
 from csv import DictReader
 from edtrawl.db import upsert_schools
 from edtrawl.db import upsert_schools_snapshots
+from edtrawl.db import SCHOOL_SNAPSHOT_COLUMNS
 
 schools_header_map = {
     "Academic Year": "academic_year",
@@ -99,7 +100,7 @@ schools_snapshots_header_map = {
 with open('25_26.csv', newline='', encoding='utf-8-sig') as f:
     for row in csv.DictReader(f):
         try:
-            clean_schools_row = {schools_header_map[k]: v for k, v in row.items() if k in schools_snapshots_header_map}
+            clean_schools_row = {schools_header_map[k]: v for k, v in row.items() if k in schools_header_map}
             upsert_schools(**clean_schools_row)
         except Exception as e:
             print(f"Error on row {e}")
@@ -107,8 +108,8 @@ with open('25_26.csv', newline='', encoding='utf-8-sig') as f:
 
         try:
             clean_snapshots_row = {schools_snapshots_header_map[k]: v for k, v in row.items() if k in schools_snapshots_header_map}
-            upsert_schools_snapshots(**clean_snapshots_row)
+            snapshot_tuple = tuple(clean_snapshots_row.get(col, None) for col in SCHOOL_SNAPSHOT_COLUMNS)
+            upsert_schools_snapshots(snapshot_tuple)
         except Exception as e:
             print(f"Error on row {e}")
             print(f"Row data: {row}")
-

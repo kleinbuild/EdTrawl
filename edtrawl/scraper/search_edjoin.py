@@ -1,17 +1,17 @@
 # search_edjoin.py
 # Loads the saved session and scrapes job listings, then filters by your criteria.
 #
-# Because I don't have edjoin.org's exact DOM in front of me, this runs in two modes:
-#   - DISCOVERY MODE (default on first run): dumps the search page's form fields and a
-#     sample of result-row HTML to console + discovery.html, so you can confirm selectors.
-#   - SCRAPE MODE: once selectors below are confirmed, extracts listings to results.csv.
+# Two modes:
+#   - DISCOVERY MODE (default): dumps the search page HTML to discovery.html
+#     so you can inspect the DOM and fill in the CSS selectors below.
+#   - SCRAPE MODE: once selectors are filled in, extracts listings to results.csv.
 #
-# Edit the CONFIG block, then run: python search_edjoin.py
+# Run: python search_edjoin.py
 
 import csv
 import re
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 from playwright.sync_api import sync_playwright
@@ -19,9 +19,6 @@ from playwright.sync_api import sync_playwright
 # ============================ CONFIG ============================
 AUTH_FILE = "auth_state.json"
 
-# Your search criteria. Leave a field as []/None to ignore it.
-# These are applied as a client-side filter over scraped rows, so they work
-# even before you've wired up the site's own search form.
 CRITERIA = {
     "keywords": [],            # e.g. ["math", "algebra"] — matches title/description (OR)
     "exclude_keywords": [],    # e.g. ["substitute", "coach"] — drops rows containing any
@@ -29,23 +26,26 @@ CRITERIA = {
     "posted_within_days": None # e.g. 14 — only keep listings posted in the last N days
 }
 
-# The edjoin search results page. Adjust if you use a specific saved search or district.
-SEARCH_URL = "https://www.edjoin.org/Home/Jobs"
+SEARCH_URL = "https://edjoin.org/Home/Jobs?rows=10&page=1&sort=postingDate&order=DESC&keywords=Los%20Angeles&location=Los%20Angeles&searchType=&states=&regions=&jobTypes=&days=0&empType=&catID=0&onlineApps=null&recruitmentCenterID=0&stateID=0&regionID=0&districtID=0&countyID=0"
 
-# Run headless once you trust it; keep False while confirming selectors.
 HEADLESS = False
 
-# Set to False once you've confirmed the selectors in the SELECTORS block below.
+# Set to False once you've inspected discovery.html and filled in the selectors.
 DISCOVERY = True
 
-# Confirm these against discovery.html output before turning DISCOVERY off.
-SELECTORS = {
-    "result_row": ".job-row, .search-result, [class*='JobResult']",
-    "title":      "a.job-title, h3 a, [class*='title'] a",
-    "link":       "a.job-title, h3 a, [class*='title'] a",
-    "location":   ".district, .location, [class*='district']",
-    "posted":     ".posted-date, .date, [class*='posted']"
-}
+# ===================== FILL THESE IN ============================
+# After running in DISCOVERY mode, open discovery.html in your browser,
+# right-click a job listing → Inspect, and find:
+#   1. The repeating element that wraps ONE job listing (a div, tr, or li)
+#   2. Inside that element: where the title, link, location, and date live
+#
+# Put the CSS class or selector for each one here.
+
+CARD_SELECTOR     = ""   # the repeating wrapper for one job listing
+TITLE_SELECTOR    = ""   # the element containing the job title text
+LINK_SELECTOR     = ""   # the <a> tag whose href is the job detail URL
+LOCATION_SELECTOR = ""   # the element containing district/location text
+POSTED_SELECTOR   = ""   # the element containing the posted date
 # ================================================================
 
 
@@ -61,75 +61,63 @@ def run():
 
         page.goto(SEARCH_URL, wait_until="networkidle")
 
-        # Bail early if the session didn't take and we got bounced to a login page.
         if re.search(r"login", page.url, re.IGNORECASE):
-            print(f"Got redirected to a login page ({page.url}). "
-                  "The saved session may have expired — re-run capture_login.py.")
+            print(f"Redirected to login ({page.url}). "
+                  "Session may have expired — re-run capture_login.py.")
             browser.close()
             sys.exit(1)
 
         if DISCOVERY:
             run_discovery(page)
-            browser.close()
-            return
+        else:
+            run_scrape(page)
 
-        run_scrape(page)
         browser.close()
 
 
 def run_discovery(page):
+    # Save full page HTML so you can inspect the DOM structure.
     html = page.content()
     Path("discovery.html").write_text(html, encoding="utf-8")
 
-    forms = page.eval_on_selector_all(
-        "input, select, textarea",
-        """els => els.map(e => ({
-            tag: e.tagName.toLowerCase(),
-            type: e.getAttribute("type"),
-            name: e.getAttribute("name"),
-            id: e.getAttribute("id"),
-            placeholder: e.getAttribute("placeholder")
-        }))"""
-    )
-
+    # Print form fields to help understand the search interface.
     print("\n--- Form fields on the search page ---")
-    for field in forms:
-        print(field)
+    for el in page.locator("input, select, textarea").all():
+        print({
+            "type": el.get_attribute("type"),
+            "name": el.get_attribute("name"),
+            "id": el.get_attribute("id"),
+            "placeholder": el.get_attribute("placeholder"),
+        })
+
     print(f"\nFull page HTML written to discovery.html")
-    print(f"\nOpen discovery.html, find the repeating block for each job listing,")
-    print(f"update the SELECTORS in this file, set DISCOVERY = False, and re-run.")
+    print(f"\nOpen discovery.html, right-click a job listing → Inspect.")
+    print(f"Find the CSS selectors and fill them in at the top of this file.")
+    print(f"Then set DISCOVERY = False and re-run.")
 
 
 def run_scrape(page):
-    try:
-        page.wait_for_selector(SELECTORS["result_row"], timeout=15000)
-    except Exception:
-        print("No rows matched SELECTORS['result_row']. "
-              "Re-run in DISCOVERY mode to fix selectors.")
-        return
+    # Wait for job listings to appear on the page.
+    page.locator(CARD_SELECTOR).first.wait_for(timeout=15000)
 
-    rows = page.eval_on_selector_all(
-        SELECTORS["result_row"],
-        """(nodes, sel) => nodes.map(n => {
-            const pick = s => {
-                const el = n.querySelector(s);
-                return el ? el.textContent.trim() : "";
-            };
-            const linkEl = n.querySelector(sel.link);
-            return {
-                title: pick(sel.title),
-                location: pick(sel.location),
-                posted: pick(sel.posted),
-                url: linkEl ? linkEl.href : ""
-            };
-        })""",
-        SELECTORS
-    )
+    rows = []
+    for card in page.locator(CARD_SELECTOR).all():
+        title    = card.locator(TITLE_SELECTOR).text_content() or ""
+        link     = card.locator(LINK_SELECTOR).get_attribute("href") or ""
+        location = card.locator(LOCATION_SELECTOR).text_content() or ""
+        posted   = card.locator(POSTED_SELECTOR).text_content() or ""
 
-    # -------- CLIENT-SIDE FILTER --------
+        rows.append({
+            "title": title.strip(),
+            "location": location.strip(),
+            "posted": posted.strip(),
+            "url": link.strip(),
+        })
+
+    # Apply your keyword/location/date filters.
     matches = [r for r in rows if passes_filter(r)]
 
-    # -------- OUTPUT --------
+    # Write results.
     with open("results.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=["title", "location", "posted", "url"])
         writer.writeheader()

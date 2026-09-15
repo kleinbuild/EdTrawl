@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 
 # resp = requests.get(
 #     "https://edjoin.org/Home/LoadJobs",
@@ -65,12 +66,27 @@ totalRecords = data['totalRecords']
 
 displayRecords = data['displayRecords']
 
+displayUntil = data['displayUntil']
+
 # TODO fix method to retrieve specific data
 
-jobListingsRetrieved = data['data'] ['postingID', 'positionTitle', 'salaryInfo', 'postingDate', 'displayUntil', 'countyName', 'districtName', 'city', 'fullCountyName', 'jobType', 'FullTimePartTime']
+jobs = data['data'] 
+
+# ['postingID', 'positionTitle', 'salaryInfo', 'postingDate', 'displayUntil', 'countyName', 'districtName', 'city', 'fullCountyName', 'jobType', 'FullTimePartTime']
 
 print('The total records found was: ', totalRecords)
 
 print('The number of records downloaded was: ',  displayRecords)
 
-print('Job listings retrieved: ', jobListingsRetrieved)
+print('Job listings retrieved: ', jobTypes)
+
+
+def parse_dotnet_date(date_string):
+    """Takes a date in .net JSON format eg. "/Date(175694845845)/" and converts it to a date and time"""
+    ms = int(date_string.strip("/").replace("Date(", "").replace(")", ""))
+    return datetime.fromtimestamp(ms / 1000)
+
+# successful test
+#print(f"This is 1820559600000 coverted to the date: {parse_dotnet_date("/Date(1820559600000)/")}")
+
+    

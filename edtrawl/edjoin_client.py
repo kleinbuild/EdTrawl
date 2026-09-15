@@ -82,6 +82,27 @@ def parse_dotnet_date(date_string):
 
 # successful test
 #print(f"This is 1820559600000 coverted to the date: {parse_dotnet_date("/Date(1820559600000)/")}")
+def jobs_truncator(jobs_data):
+    """Takes JSON job listings and prints only the relevant key:value pairs"""
+    truncated_jobs = []
+    for job in jobs:
+        new_job = {
+            'postingID': job['postingID'],
+            'positionTitle': job['positionTitle'],
+            'salaryInfo': job['salaryInfo'],
+            'postingDate': parse_dotnet_date(job['postingDate']),
+            'displayUntil': parse_dotnet_date(job['displayUntil']),
+            'countyName': job['countyName'],
+            'districtName': job['districtName'],
+            'city': job['city'],
+            'fullCountyName': job['fullCountyName'],
+            'jobType': job['jobType'],
+            'FullTimePartTime': job['FullTimePartTime']
+        }
+        truncated_jobs.append(new_job)
+    return truncated_jobs
 
-for job in jobs:
-    print(job['postingID'], job['positionTitle'], job['salaryInfo'], parse_dotnet_date(job['postingDate']), parse_dotnet_date(job['displayUntil']), job['countyName'], job['districtName'], job['city'], job['fullCountyName'], job['jobType'], job['FullTimePartTime'])
+truncated_jobs = jobs_truncator(jobs)
+print('below is truncated_jobs content:')
+print(truncated_jobs)
+

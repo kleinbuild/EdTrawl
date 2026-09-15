@@ -66,19 +66,13 @@ totalRecords = data['totalRecords']
 
 displayRecords = data['displayRecords']
 
-displayUntil = data['displayUntil']
-
-# TODO fix method to retrieve specific data
-
 jobs = data['data'] 
-
-# ['postingID', 'positionTitle', 'salaryInfo', 'postingDate', 'displayUntil', 'countyName', 'districtName', 'city', 'fullCountyName', 'jobType', 'FullTimePartTime']
 
 print('The total records found was: ', totalRecords)
 
 print('The number of records downloaded was: ',  displayRecords)
 
-print('Job listings retrieved: ', jobTypes)
+#print('Job listings retrieved: ', jobTypes)
 
 
 def parse_dotnet_date(date_string):
@@ -89,4 +83,5 @@ def parse_dotnet_date(date_string):
 # successful test
 #print(f"This is 1820559600000 coverted to the date: {parse_dotnet_date("/Date(1820559600000)/")}")
 
-    
+for job in jobs:
+    print(job['postingID'], job['positionTitle'], job['salaryInfo'], parse_dotnet_date(job['postingDate']), parse_dotnet_date(job['displayUntil']), job['countyName'], job['districtName'], job['city'], job['fullCountyName'], job['jobType'], job['FullTimePartTime'])

@@ -130,14 +130,22 @@ listings_header_map = {
     'FullTimePartTime': "full_time_part_time"
 }
 
-# TODO complete heading table
 cur.execute('''
     CREATE TABLE IF NOT EXISTS listings (
-        postingid INTEGER PRIMARY KEY
-        
+        posting_id INTEGER PRIMARY KEY,
+        position_title TEXT,
+        salary_info TEXT,
+        posting_date DATETIME,
+        display_until DATETIME,
+        county_name TEXT,
+        district_name TEXT,
+        city TEXT,
+        full_county_name TEXT,
+        job_type TEXT,
+        full_time_part_time TEXT
         )
 
-)
+''')
 
 cur.executemany(
 

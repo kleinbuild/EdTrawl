@@ -1,55 +1,26 @@
 import requests
 from datetime import datetime
+import sqlite3
+from db import get_connection
+from pathlib import path
 
-# resp = requests.get(
-#     "https://edjoin.org/Home/LoadJobs",
-#     params = {
-#         "rows": rows,
-#         "page": page,
-#         "sort": sort,
-#         "sortVal": sort_value,
-#         "order": order,
-#         "keywords": keywords,
-#         "location": location,
-#         "searchType": searchType,
-#         "regions": regions,
-#         "jobTypes": jobTypes,
-#         "days": daysFromPosting,
-#         "empType": employmentType,
-#         "catID": categoryID,
-#         "onlineApps": onlineApps,
-#         "recruitmentCenterID": 0,
-#         "stateID": 0,
-#         "regionID": 0,
-#         "districtID": 0,
-#         "searchID": 0,
-#         }
-# )
-
-# print(resp.url)
-
-# data = response.json()
-
-# print(data)
-
-# hardcoded test run
 resp = requests.get(
     "https://edjoin.org/Home/LoadJobs",
     params = {
-        "rows": 8,
-        "page": 1,
-        "sort": 'postingDate',
-        "sortVal": 1,
-        "order": 'ASC',
-        "keywords": 'substitute',
-        "location": 'Los Angeles',
-        "searchType": '',
-        "regions": '',
-        "jobTypes": '',
-        "days": 7,
-        "empType": 'full',
-        "catID": 1,
-        "onlineApps": 'true',
+        "rows": rows,
+        "page": page,
+        "sort": sort,
+        "sortVal": sort_value,
+        "order": order,
+        "keywords": keywords,
+        "location": location,
+        "searchType": searchType,
+        "regions": regions,
+        "jobTypes": jobTypes,
+        "days": daysFromPosting,
+        "empType": employmentType,
+        "catID": categoryID,
+        "onlineApps": onlineApps,
         "recruitmentCenterID": 0,
         "stateID": 0,
         "regionID": 0,
@@ -60,7 +31,39 @@ resp = requests.get(
 
 print(resp.url)
 
-data = resp.json()
+data = response.json()
+
+print(data)
+
+# hardcoded test run
+# resp = requests.get(
+#     "https://edjoin.org/Home/LoadJobs",
+#     params = {
+#         "rows": 8,
+#         "page": 1,
+#         "sort": 'postingDate',
+#         "sortVal": 1,
+#         "order": 'ASC',
+#         "keywords": 'substitute',
+#         "location": 'Los Angeles',
+#         "searchType": '',
+#         "regions": '',
+#         "jobTypes": '',
+#         "days": 7,
+#         "empType": 'full',
+#         "catID": 1,
+#         "onlineApps": 'true',
+#         "recruitmentCenterID": 0,
+#         "stateID": 0,
+#         "regionID": 0,
+#         "districtID": 0,
+#         "searchID": 0,
+#         }
+# )
+
+# print(resp.url)
+
+# data = resp.json()
 
 totalRecords = data['totalRecords']
 
@@ -105,4 +108,40 @@ def jobs_truncator(jobs_data):
 truncated_jobs = jobs_truncator(jobs)
 print('below is truncated_jobs content:')
 print(truncated_jobs)
+
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "edtrawl.db"
+
+# TODO use the imported function with the SQL insert
+
+conn = sqlite3.connect(DB_PATH)
+cur = conn.cursor()
+
+listings_header_map = {
+    'postingID': "posting_id",
+    'positionTitle': "position_title",
+    'salaryInfo': "salary_info",
+    'postingDate': "posting_date",
+    'displayUntil': "display_until",
+    'countyName': "county_name",
+    'districtName': "district_name",
+    'city': "city",
+    'fullCountyName': "full_county_name",
+    'jobType': "job_type",
+    'FullTimePartTime': "full_time_part_time"
+}
+
+# TODO complete heading table
+cur.execute('''
+    CREATE TABLE IF NOT EXISTS listings (
+        postingid INTEGER PRIMARY KEY
+        
+        )
+
+)
+
+cur.executemany(
+
+)
+
+
 

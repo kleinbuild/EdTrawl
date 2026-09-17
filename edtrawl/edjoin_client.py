@@ -111,13 +111,6 @@ truncated_jobs = jobs_truncator(jobs)
 print('below is truncated_jobs content:')
 print(truncated_jobs)
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "edtrawl.db"
-
-# TODO use the imported function with the SQL insert
-
-conn = sqlite3.connect(DB_PATH)
-cur = conn.cursor()
-
 listings_header_map = {
     'postingID': "posting_id",
     'positionTitle': "position_title",
@@ -132,14 +125,14 @@ listings_header_map = {
     'FullTimePartTime': "full_time_part_time"
 }
 
-    for row in truncated_jobs:
-        try:
-            clean_listings_row = {listings_header_map[k]: v for k, v in row.items() if k in listings_header_map}
-            listings_tuple = tuple(clean_listings_row.get(col, None) for col in LISTINGS_COLUMNS)
-            upsert_listings(listings_tuple)
-        except Exception as e:
-            print(f"Error on row {e}")
-            print(f"Row data: {row}")
+for row in truncated_jobs:
+    try:
+        clean_listings_row = {listings_header_map[k]: v for k, v in row.items() if k in listings_header_map}
+        listings_tuple = tuple(clean_listings_row.get(col, None) for col in LISTINGS_COLUMNS)
+        upsert_listings(listings_tuple)
+    except Exception as e:
+        print(f"Error on row {e}")
+        print(f"Row data: {row}")
 
 
 

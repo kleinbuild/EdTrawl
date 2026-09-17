@@ -3,6 +3,8 @@ from datetime import datetime
 import sqlite3
 from db import get_connection
 from pathlib import path
+from edtrawl.db import upsert_listings
+from edtrawl.db import LISTINGS_COLUMNS
 
 resp = requests.get(
     "https://edjoin.org/Home/LoadJobs",
@@ -130,26 +132,17 @@ listings_header_map = {
     'FullTimePartTime': "full_time_part_time"
 }
 
-cur.execute('''
-    CREATE TABLE IF NOT EXISTS listings (
-        posting_id INTEGER PRIMARY KEY,
-        position_title TEXT,
-        salary_info TEXT,
-        posting_date DATETIME,
-        display_until DATETIME,
-        county_name TEXT,
-        district_name TEXT,
-        city TEXT,
-        full_county_name TEXT,
-        job_type TEXT,
-        full_time_part_time TEXT
-        )
+    for row in truncated_jobs:
+        try:
+            clean_listings_row = {listings_header_map[k]: v for k, v in row.items() if k in listings_header_map}
+            listings_tuple = tuple(clean_listings_row.get(col, None) for col in LISTINGS_COLUMNS)
+            upsert_listings(listings_tuple)
+        except Exception as e:
+            print(f"Error on row {e}")
+            print(f"Row data: {row}")
 
-''')
 
-cur.executemany(
 
-)
 
 
 

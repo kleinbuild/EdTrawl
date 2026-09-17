@@ -139,6 +139,23 @@ SCHEMA = [
         
     );
     """,
+
+    """
+        CREATE TABLE IF NOT EXISTS listings (
+        posting_id INTEGER PRIMARY KEY,
+        position_title TEXT,
+        salary_info TEXT,
+        posting_date DATETIME,
+        display_until DATETIME,
+        county_name TEXT,
+        district_name TEXT,
+        city TEXT,
+        full_county_name TEXT,
+        job_type TEXT,
+        full_time_part_time TEXT
+        )
+    );
+    """
 ]
 
 def init_db() -> None:
@@ -220,6 +237,24 @@ def upsert_schools_snapshots(data: tuple) -> None:
     """
     with get_connection() as conn:
         row = conn.execute(SQL, data)
+
+
+LISTINGS_COLUMNS = [
+    "posting_id", "position_title", "salary_info", "posting_date", "display_until", "county_name", "district_name", "city", "full_county_name", "job_type", "full_time_part_time"
+]
+
+def upsert_listings(data: tuple) -> None:
+    cols         = ", ".join(LISTINGS_COLUMNS)
+    placeholders = ", ".join("?" * len(LISTINGS_COLUMNS))
+    
+    SQL = f"""
+        INSERT INTO listings ({cols})
+        VALUES ({placeholders})
+        ON CONFLICT(posting_id) DO NOTHING
+    """
+    with get_connection() as conn:
+        row = conn.execute(SQL, data)
+
 
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.

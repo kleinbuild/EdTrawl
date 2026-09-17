@@ -153,7 +153,7 @@ SCHEMA = [
         full_county_name TEXT,
         job_type TEXT,
         full_time_part_time TEXT
-        )
+        
     );
     """
 ]

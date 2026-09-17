@@ -1,8 +1,5 @@
 import requests
 from datetime import datetime
-import sqlite3
-from db import get_connection
-from pathlib import path
 from edtrawl.db import upsert_listings
 from edtrawl.db import LISTINGS_COLUMNS
 

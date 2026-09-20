@@ -196,7 +196,6 @@ SCHEMA = [
         locale_description          TEXT,
         districts_row_updated       DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (cds_code, academic_year),
-        FOREIGN KEY (cds_code) REFERENCES schools(cds_code)
         
     );
     """,

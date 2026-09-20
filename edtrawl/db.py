@@ -140,11 +140,8 @@ SCHEMA = [
     );
     """,
 
-
     """
     CREATE TABLE IF NOT EXISTS districts (
-        academic_year               TEXT,
-        fed_id                      TEXT,
         district_code               TEXT,
         cds_code                    TEXT,
         county_name                 TEXT,
@@ -152,14 +149,24 @@ SCHEMA = [
         district_type               TEXT,
         grade_low                   TEXT,
         grade_high                  TEXT,
-        assistance_status           TEXT,
         street                      TEXT,
         city                        TEXT,
         zip                         TEXT,
+        latitude                    REAL,
+        longitude                   REAL,
+        PRIMARY KEY (cds_code)
+
+    );
+    """,
+
+    """
+    CREATE TABLE IF NOT EXISTS districts_snapshots (
+        academic_year               TEXT,
+        fed_id                      TEXT,
+        cds_code                    TEXT,
+        assistance_status           TEXT,
         region                      TEXT,
         locale_code                 TEXT,
-        latitude                    TEXT,
-        longitude                   TEXT,
         enrollment_total_district   TEXT,
         enrollment_charter          TEXT,
         enrollment_non_charter      TEXT,
@@ -196,6 +203,7 @@ SCHEMA = [
         locale_description          TEXT,
         districts_row_updated       DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (cds_code, academic_year),
+        FOREIGN KEY (cds_code) REFERENCES districts(cds_code),
         
     );
     """,

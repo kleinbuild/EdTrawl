@@ -240,6 +240,22 @@ def upsert_schools_snapshots(data: tuple) -> None:
 
 DISTRICTS_COLUMNS = ["academic_year", "fed_id", "district_code", "cds_code", "county_name", "district_name", "district_type", "grade_low", "grade_high", "assistance_status", "street", "city", "zip", "region", "locale_code",  "latitude", "longitude", "enrollment_total_district", "enrollment_charter", "enrollment_non_charter", "african_amer", "african_amer_pct", "amer_indian", "amer_indian_pct", "asian", "asian_pct", "filipino", "filipino_pct", "hispanic", "hispanic_pct", "pac_islander", "pac_islander_pct", "white", "white_pct", "two_or_more_races", "two_or_more_races_pct", "not_reported", "not_reported_pct", "english_learner", "english_learner_pct", "foster", "foster_pct", "homeless", "homeless_pct", "migrant", "migrant_pct", "soc_disadvantaged", "soc_disadvantaged_pct", "students_with_dis", "students_with_dis_pct", "locale_description"]
 
+def upsert_districts(data: tuple) -> None:
+    cols         = ", ".join(DISTRICTS_COLUMNS)
+    placeholders = ", ".join("?" * len(DISTRICTS_COLUMNS))
+    
+set_clause == ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_COLUMNS)
+
+    SQL = f"""
+        INSERT INTO districts ({cols})
+        VALUES ({placeholders})
+        ON CONFLICT(cds_code) DO UPDATE SET 
+          {set_clause}
+        WHERE excluded.academic_year > districts.academic_year
+    """
+    with get_connection() as conn:
+        row = conn.execute(SQL, data)
+
 LISTINGS_COLUMNS = [
     "posting_id", "position_title", "salary_info", "posting_date", "display_until", "county_name", "district_name", "city", "full_county_name", "job_type", "full_time_part_time", "matched_district_code", "matched_cds_code", "match_confidence"
 ]

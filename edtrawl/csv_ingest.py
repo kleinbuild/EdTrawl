@@ -167,3 +167,13 @@ with open('25_26.csv', newline='', encoding='utf-8-sig') as f:
         except Exception as e:
             print(f"Error on row {e}")
             print(f"Row data: {row}")
+
+with open('DistrictSites2526_-2532054265423306741.csv', newline='', encoding='utf-8-sig') as f:
+    for row in csv.DictReader(f):
+        try:
+            clean_districts_row = {districts_header_map[k]: v for k, v in row.items() if k in districts_header_map}
+            districts_tuple = tuple(clean_districts_row.get(col, None) for col in DISTRICTS_COLUMNS)
+            upsert_districts(districts_tuple)
+        except Exception as e:
+            print(f"Error on row {e}")
+            print(f"Row data: {row}")

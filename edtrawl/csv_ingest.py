@@ -122,7 +122,7 @@ districts_snapshots_header_map = {
     "Region": "region",
     "Locale Code": "locale_code",
     "Enroll Total": "enrollment_total_district",
-    "Enroll Charter" "enrollment_charter",
+    "Enroll Charter": "enrollment_charter",
     "Enroll Non Charter": "enrollment_non_charter",
     "African American": "african_amer",            
     "African American (%)": "african_amer_pct",     

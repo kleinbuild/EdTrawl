@@ -5,6 +5,8 @@ from csv import DictReader
 from edtrawl.db import upsert_schools
 from edtrawl.db import upsert_schools_snapshots
 from edtrawl.db import SCHOOL_SNAPSHOT_COLUMNS
+from edtrawl.db import DISTRICTS_COLUMNS
+from edtrawl.db import DISTRICTS_SNAPSHOTS_COLUMNS
 
 schools_header_map = {
     "Academic Year": "academic_year",
@@ -112,7 +114,6 @@ districts_header_map = {
     "Longitude": "longitude",
 }
 
-
 districts_snapshots_header_map = {
     "Academic Year": "academic_year",                
     "Fed ID": "fed_id",                
@@ -179,6 +180,14 @@ with open('DistrictSites2526_-2532054265423306741.csv', newline='', encoding='ut
             clean_districts_row = {districts_header_map[k]: v for k, v in row.items() if k in districts_header_map}
             districts_tuple = tuple(clean_districts_row.get(col, None) for col in DISTRICTS_COLUMNS)
             upsert_districts(districts_tuple)
+        except Exception as e:
+            print(f"Error on row {e}")
+            print(f"Row data: {row}")
+
+        try:
+            clean_districts_snapshots_row = {districts_snapshots_header_map[k]: v for k, v in row.items() if k in districts_snapshots_header_map}
+            districts_snapshots_tuple = tuple(clean_districts_snapshots_row.get(col, None) for col in DISTRICTS_SNAPSHOTS_COLUMNS)
+            upsert_districts_snapshots(districts_snapshots_tuple)
         except Exception as e:
             print(f"Error on row {e}")
             print(f"Row data: {row}")

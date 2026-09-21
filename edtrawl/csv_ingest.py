@@ -97,23 +97,29 @@ schools_snapshots_header_map = {
 }
 
 districts_header_map = {
-    "Academic Year": "academic_year",                
-    "Fed ID": "fed_id",                
     "District Code": "district_code",
     "CDS Code": "cds_code",
     "County Name": "county_name",
     "District Name": "district_name",
+    "Academic Year": "academic_year",
     "District Type": "district_type",
     "Grade Low": "grade_low",
     "Grade High": "grade_high",
-    "Assistance Status": "assistance_status",
     "Street": "street",
     "City": "city",
     "Zip": "zip",
-    "Region": "region",
-    "Locale Code": "locale_code",
     "Latitude": "latitude",
     "Longitude": "longitude",
+}
+
+
+districts_snapshots_header_map = {
+    "Academic Year": "academic_year",                
+    "Fed ID": "fed_id",                
+    "CDS Code": "cds_code",
+    "Assistance Status": "assistance_status",
+    "Region": "region",
+    "Locale Code": "locale_code",
     "Enroll Total": "enrollment_total_district",
     "Enroll Charter" "enrollment_charter",
     "Enroll Non Charter": "enrollment_non_charter",
@@ -149,7 +155,6 @@ districts_header_map = {
     "Students with Disabilities (%)": "students_with_dis_pct",
     "Locale Description": "locale_description"
 }
-
 
 with open('25_26.csv', newline='', encoding='utf-8-sig') as f:
     for row in csv.DictReader(f):

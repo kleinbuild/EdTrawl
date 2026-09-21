@@ -204,13 +204,13 @@ SCHEMA = [
         locale_description          TEXT,
         districts_row_updated       DATETIME DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (cds_code, academic_year),
-        FOREIGN KEY (cds_code) REFERENCES districts(cds_code),
+        FOREIGN KEY (cds_code) REFERENCES districts(cds_code)
         
     );
     """,
 
     """
-        CREATE TABLE IF NOT EXISTS listings (
+    CREATE TABLE IF NOT EXISTS listings (
         posting_id INTEGER PRIMARY KEY,
         position_title TEXT,
         salary_info TEXT,
@@ -313,7 +313,7 @@ def upsert_districts(data: tuple) -> None:
     cols         = ", ".join(DISTRICTS_COLUMNS)
     placeholders = ", ".join("?" * len(DISTRICTS_COLUMNS))
     
-set_clause == ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_COLUMNS)
+    set_clause == ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_COLUMNS)
 
     SQL = f"""
         INSERT INTO districts ({cols})

@@ -313,7 +313,7 @@ def upsert_districts(data: tuple) -> None:
     cols         = ", ".join(DISTRICTS_COLUMNS)
     placeholders = ", ".join("?" * len(DISTRICTS_COLUMNS))
     
-    set_clause == ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_COLUMNS)
+    set_clause = ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_COLUMNS)
 
     SQL = f"""
         INSERT INTO districts ({cols})
@@ -331,8 +331,6 @@ def upsert_districts_snapshots(data: tuple) -> None:
     cols         = ", ".join(DISTRICTS_SNAPSHOTS_COLUMNS)
     placeholders = ", ".join("?" * len(DISTRICTS_SNAPSHOTS_COLUMNS))
     
-    set_clause = ", ".join(f"{col} = excluded.{col}" for col in DISTRICTS_SNAPSHOTS_COLUMNS)
-
     SQL = f"""
         INSERT INTO districts_snapshots ({cols})
         VALUES ({placeholders})

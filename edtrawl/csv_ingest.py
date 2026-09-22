@@ -4,6 +4,8 @@ import csv
 from csv import DictReader
 from edtrawl.db import upsert_schools
 from edtrawl.db import upsert_schools_snapshots
+from edtrawl.db import upsert_districts
+from edtrawl.db import upsert_districts_snapshots
 from edtrawl.db import SCHOOL_SNAPSHOT_COLUMNS
 from edtrawl.db import DISTRICTS_COLUMNS
 from edtrawl.db import DISTRICTS_SNAPSHOTS_COLUMNS

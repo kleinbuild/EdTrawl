@@ -1,16 +1,10 @@
 """
 match.py — filter schools/jobs against your commute constraints.
 
-It first matches listing names to districts (or if specified, schools) in the database to pull lat/long coordinates. 
-
 It then reads cached coordinates and travel times and decides what clears your bar.
 
 
 Planned shape:
-TODO: determine if get_coordinates belongs somewhere else, like in edjoin_client.py
-    get_coordinates
-        SQL Query to rapidfuzz matching; returns lat/long and cds code to add to listings row
-
     within_radius(home, school, miles) -> bool
         Straight-line (haversine) distance filter. Cheap first pass 
 
@@ -20,7 +14,6 @@ TODO: determine if get_coordinates belongs somewhere else, like in edjoin_client
 Order matters for cost: radius-filter first (free, local), THEN travel-time the
 survivors. That ordering is what keeps API usage minimal.
 """
-
 from math import radians, sin, cos, asin, sqrt
 
 

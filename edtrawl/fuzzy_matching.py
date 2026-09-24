@@ -1,4 +1,11 @@
+import sqlite3
+from pathlib import Path
+
+
 from rapidfuzz.process import extractOne
+
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "edtrawl.db"
+
 
 # Planned shape:
 #     get_coordinates

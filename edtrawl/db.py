@@ -221,10 +221,17 @@ SCHEMA = [
         city TEXT,
         full_county_name TEXT,
         job_type TEXT,
-        full_time_part_time TEXT
-        
+        full_time_part_time TEXT,
+        district_match_name TEXT,
+        district_match_cds_code TEXT,
+        district_match_score REAL,
+        district_match_status TEXT,
+        school_match_name TEXT,
+        school_match_cds_code TEXT,
+        school_match_score REAL,
+        school_match_status REAL
     );
-    """
+    """ 
 ]
 
 def init_db() -> None:

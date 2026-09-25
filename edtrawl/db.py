@@ -347,7 +347,7 @@ def upsert_districts_snapshots(data: tuple) -> None:
         row = conn.execute(SQL, data)
 
 LISTINGS_COLUMNS = [
-    "posting_id", "position_title", "salary_info", "posting_date", "display_until", "county_name", "district_name", "city", "full_county_name", "job_type", "full_time_part_time", "matched_district_code", "matched_cds_code", "match_confidence", "district_match_name", "district_match_cds_code", "district_match_score", "district_match_status", "school_match_name", "school_match_cds_code", "school_match_score", "school_match_status"
+    "posting_id", "position_title", "salary_info", "posting_date", "display_until", "county_name", "district_name", "city", "full_county_name", "job_type", "full_time_part_time"
 ]
 
 def upsert_listings(data: tuple) -> None:
@@ -362,6 +362,13 @@ def upsert_listings(data: tuple) -> None:
     with get_connection() as conn:
         row = conn.execute(SQL, data)
 
+LISTINGS_DISTRICTS_MATCH_COLUMNS = [
+    "district_match_name", "district_match_cds_code", "district_match_score", "district_match_status"
+]
+
+LISTINGS_SCHOOLS_MATCH_COLUMNS = [
+    "school_match_name", "school_match_cds_code", "school_match_score", "school_match_status"
+]
 
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.

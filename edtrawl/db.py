@@ -366,6 +366,12 @@ LISTINGS_DISTRICTS_MATCH_COLUMNS = [
     "district_match_name", "district_match_cds_code", "district_match_score", "district_match_status"
 ]
 
+def upsert_listings_district_match(data: tuple) -> None:
+    cols         = ", ".join(LISTINGS_DISTRICTS_MATCH_COLUMNS)
+    placeholders = ", ".join("?" *len(LISTINGS_DISTRICTS_MATCH_COLUMNS))
+
+    
+
 LISTINGS_SCHOOLS_MATCH_COLUMNS = [
     "school_match_name", "school_match_cds_code", "school_match_score", "school_match_status"
 ]

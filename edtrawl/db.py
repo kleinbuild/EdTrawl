@@ -370,7 +370,16 @@ def upsert_listings_district_match(data: tuple) -> None:
     cols         = ", ".join(LISTINGS_DISTRICTS_MATCH_COLUMNS)
     placeholders = ", ".join("?" *len(LISTINGS_DISTRICTS_MATCH_COLUMNS))
 
-    
+    SQL = f"""
+        INSERT INTO listings ({cols})
+        VALUES ({placeholders})
+    """
+OR?
+    SQL = f"""UPDATE listings SET {cols} WHERE posting_id = ?
+    """
+
+    with get_connection() as conn:
+        row = conn.execute(SQL, data)
 
 LISTINGS_SCHOOLS_MATCH_COLUMNS = [
     "school_match_name", "school_match_cds_code", "school_match_score", "school_match_status"

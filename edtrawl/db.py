@@ -390,6 +390,25 @@ def update_listings_school_match(data: tuple) -> None:
         if cursor.rowcount == 0;
             print(f"No listing found for posting_id {data[-1]}")
 
+def get_listings_needing_school_match() -> list:
+    SQL = """
+        SELECT posting_id, position_title
+        FROM listings
+        WHERE school_match_status IS NULL
+    """
+    with get_connection() as conn:
+        return conn.execute(SQL).fetchall()
+
+def get_listings_needing_district_match() -> list:
+    SQL = """
+        SELECT posting_id, district_name
+        FROM listings
+        WHERE school_match_status IN ('no_match', 'below_threshold')
+            AND district_match_status IS NULL
+    """
+    with get_connection() as conn:
+        return conn.execute(SQL).fetchall()
+
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.
     # As you complete the TODOs, add quick test calls here to check them, e.g.:

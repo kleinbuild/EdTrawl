@@ -390,9 +390,16 @@ def update_listings_school_match(data: tuple) -> None:
         if cursor.rowcount == 0;
             print(f"No listing found for posting_id {data[-1]}")
 
+def get_schools_in_district(district_name: str) -> list:
+    SQL = """
+        SELECT cds_code, school_name
+        FROM schools
+        WHERE district_name = ?
+    """
+
 def get_listings_needing_school_match() -> list:
     SQL = """
-        SELECT posting_id, position_title
+        SELECT posting_id, position_title, district_name
         FROM listings
         WHERE school_match_status IS NULL
     """

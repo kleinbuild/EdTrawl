@@ -380,6 +380,16 @@ LISTINGS_SCHOOLS_MATCH_COLUMNS = [
     "school_match_name", "school_match_cds_code", "school_match_score", "school_match_status"
 ]
 
+def update_listings_school_match(data: tuple) -> None:
+    sets = ", ".join(f"{c} = ?" for c in LISTINGS_SCHOOLS_MATCH_COLUMNS)
+
+    SQL = f"UPDATE listings SET {sets} WHERE posting_id = ?"
+
+    with get_connection() as conn:
+        cursor = conn.execute(SQL, data)
+        if cursor.rowcount == 0;
+            print(f"No listing found for posting_id {data[-1]}")
+
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.
     # As you complete the TODOs, add quick test calls here to check them, e.g.:

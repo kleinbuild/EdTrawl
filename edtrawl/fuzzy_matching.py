@@ -1,6 +1,6 @@
 import sqlite3
 from pathlib import Path
-from edtrawl.db import get_listings_needing_school_match, get_listings_needing_district_match, update_listings_district_match, update_listings_school_match
+from edtrawl.db import get_listings_needing_school_match, get_listings_needing_district_match, update_listings_district_match, update_listings_school_match, get_schools_in_district
 
 from rapidfuzz import fuzz
 from rapidfuzz.process import extractOne
@@ -40,6 +40,6 @@ for posting_id, position_title, district_name in get_listings_needing_school_mat
 
     update_listings_school_match((name, cds_code, score, status))
 
-def get_coordinates()
-    """uses rapidfuzz to find match and then adds coordinates and cds_code to listing
-    """
+# def get_coordinates()
+#     """uses rapidfuzz to find match and then adds coordinates and cds_code to listing
+#     """

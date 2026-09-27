@@ -38,7 +38,7 @@ for posting_id, position_title, district_name in get_listings_needing_school_mat
     else:
         status = "matched"
 
-    update_listings_school_match((name, cds_code, score, status))
+    update_listings_school_match((name, cds_code, score, status, posting_id))
 
 # def get_coordinates()
 #     """uses rapidfuzz to find match and then adds coordinates and cds_code to listing

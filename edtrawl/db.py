@@ -396,6 +396,8 @@ def get_schools_in_district(district_name: str) -> list:
         FROM schools
         WHERE district_name = ?
     """
+    with get_connection() as conn:
+        return conn.execute(SQL, (district_name,)).fetchall()
 
 def get_listings_needing_school_match() -> list:
     SQL = """

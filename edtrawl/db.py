@@ -386,9 +386,9 @@ def update_listings_school_match(data: tuple) -> None:
     SQL = f"UPDATE listings SET {sets} WHERE posting_id = ?"
 
     with get_connection() as conn:
-        cursor = conn.execute(SQL, data)
+        cursor = conn.execute(SQL, (*match, posting_id))
         if cursor.rowcount == 0:
-            print(f"No listing found for posting_id {data[-1]}")
+            print(f"No listing found for posting_id {posting_id}")
 
 def get_schools_in_district(district_name: str) -> list:
     SQL = """

@@ -373,7 +373,7 @@ def update_listings_district_match(data: tuple) -> None:
 
     with get_connection() as conn:
         cursor = conn.execute(SQL, data)
-        if cursor.rowcount == 0
+        if cursor.rowcount == 0:
             print(f"No listing found for posting_id {data[-1]}")
 
 LISTINGS_SCHOOLS_MATCH_COLUMNS = [
@@ -387,7 +387,7 @@ def update_listings_school_match(data: tuple) -> None:
 
     with get_connection() as conn:
         cursor = conn.execute(SQL, data)
-        if cursor.rowcount == 0;
+        if cursor.rowcount == 0:
             print(f"No listing found for posting_id {data[-1]}")
 
 def get_schools_in_district(district_name: str) -> list:

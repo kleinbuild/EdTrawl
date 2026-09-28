@@ -31,6 +31,8 @@ THRESHOLD = 85
 for posting_id, position_title, district_name in get_listings_needing_school_match():
     name, cds_code, score = best_school_match(position_title, district_name)
 
+    print(f"Processing row {posting_id}...", flush=True)
+
     if name is None:
         status = "no_match"
     elif score < THRESHOLD:
@@ -40,6 +42,8 @@ for posting_id, position_title, district_name in get_listings_needing_school_mat
 
     update_listings_school_match((name, cds_code, score, status, posting_id))
 
+
+#output_file.write(f"\n--- Processed {row_count} total rows ---\n")
 # def get_coordinates()
 #     """uses rapidfuzz to find match and then adds coordinates and cds_code to listing
 #     """

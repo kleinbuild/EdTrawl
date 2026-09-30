@@ -28,19 +28,27 @@ def best_school_match(position_title: str, district_name: str):
 
 THRESHOLD = 85
 
-for posting_id, position_title, district_name in get_listings_needing_school_match():
-    name, cds_code, score = best_school_match(position_title, district_name)
+not_marked = True
+while not_marked:
 
-    print(f"Processing row {posting_id}...", flush=True)
+    for posting_id, position_title, district_name in get_listings_needing_school_match():
+        name, cds_code, score = best_school_match(position_title, district_name)
 
-    if name is None:
-        status = "no_match"
-    elif score < THRESHOLD:
-        status = "below_threshold"
-    else:
-        status = "matched"
+        print(f"Processing row {posting_id}...", flush=True)
 
-    update_listings_school_match((name, cds_code, score, status, posting_id))
+        if name is None:
+            status = "no_match"
+        elif score < THRESHOLD:
+            status = "below_threshold"
+        else:
+            status = "matched"
+
+        if status == '':
+            continue
+        else: 
+            not_marked = True
+
+        update_listings_school_match((name, cds_code, score, status, posting_id))
 
 
 #output_file.write(f"\n--- Processed {row_count} total rows ---\n")

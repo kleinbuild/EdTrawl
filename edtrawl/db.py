@@ -229,7 +229,7 @@ SCHEMA = [
         school_match_name TEXT,
         school_match_cds_code TEXT,
         school_match_score REAL,
-        school_match_status REAL
+        school_match_status TEXT
     );
     """ 
 ]

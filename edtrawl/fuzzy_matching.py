@@ -12,8 +12,6 @@ DB_PATH = Path(__file__).resolve().parent.parent / "data" / "edtrawl.db"
 #     get_coordinates
 #         SQL Query to rapidfuzz matching; returns lat/long and cds code to add to listings row
 
-print(f"Processing row {posting_id}...", flush=True)
-
 def best_school_match(position_title: str, district_name: str):
     candidates = get_schools_in_district(district_name)
     if not candidates:
@@ -33,6 +31,7 @@ THRESHOLD = 85
 if __name__ == "__main__":
 
     for posting_id, position_title, district_name in get_listings_needing_school_match():
+        print(f"Processing row {posting_id}...", flush=True)
         name, cds_code, score = best_school_match(position_title, district_name)
 
         if name is None:

@@ -12,7 +12,7 @@ DB_PATH = Path(__file__).resolve().parent.parent / "data" / "edtrawl.db"
 #     get_coordinates
 #         SQL Query to rapidfuzz matching; returns lat/long and cds code to add to listings row
 
-    print(f"Processing row {posting_id}...", flush=True)
+print(f"Processing row {posting_id}...", flush=True)
 
 def best_school_match(position_title: str, district_name: str):
     candidates = get_schools_in_district(district_name)

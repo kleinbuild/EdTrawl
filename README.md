@@ -15,17 +15,22 @@ In the finished tool, Phase 5 plans to use an LLM API call for one specific task
 ## Structure
 
 ```
-scraper/           Node/Playwright scripts for edjoin.org
-  capture_login.js   Save an authenticated browser session (run manually)
-  search_edjoin.js   Scrape job listings (discovery mode + scrape mode)
-data/
-  db.py              SQLite schema and upsert functions (WIP)
-  reference/         CDE source CSVs (not committed; see below)
-pipeline/
+scraper/           Node/Playwright scripts for edjoin.org (Currently Deprecated)
+  capture_login.js   Save an authenticated browser session (run manually; Currently Deprecated)
+  search_edjoin.js   Scrape job listings (discovery mode + scrape mode; currently deprecated.)
+data/                CDE source CSVs and edtrawl.db (not committed; see below)
+edtrawl/
+  db.py              SQLite schema, upserts, and queries
+  csv_ingest.py      Load the CDE school/district CSVs into the database
   column_dict.py     CSV header → DB column name mappings
+  edjoin_client.py   Pull edjoin.org listings into the database
+  fuzzy_matching.py  Match listings to schools/districts (rapidfuzz)
+  clustering.py      Collapse nearby schools into clusters for drive times
   geocode.py         Address → lat/lng (stub)
   match.py           Haversine radius filter (implemented), commute filter (stub)
   travel_time.py     Traffic-aware drive time (stub)
+  scraper/           Python/Playwright versions of the scraper scripts (Deprecated)
+tests/               pytest tests
 notes/               Learning notes and project plan
 ```
 
@@ -40,9 +45,10 @@ The school data comes from CDE's "California Public Schools" file on [data.ca.go
 npm install
 
 # Python side
-pip install -e .          # or: pip install requests
+pip install -e ".[dev]"   # project + pytest
 cp .env.example .env      # fill in your address and API keys
-python data/db.py         # initialize the database (once schema is complete)
+python -m edtrawl.db      # initialize the database
+pytest                    # run the tests
 ```
 
 ## Usage (planned)
@@ -53,6 +59,34 @@ npm run search            # scrape job listings
 python -m pipeline.ingest # (Phase 2) load CDE school data
 python -m pipeline.run    # (Phase 3+) geocode, compute travel times, filter
 ```
+
+### School clusters
+
+Schools on the same campus or block get the same drive time from home, so
+`edtrawl/clustering.py` groups them and travel times can be computed once per
+cluster instead of once per school. It reads the `schools` table and writes two
+tables to `data/edtrawl.db`: `school_clusters` (one row per cluster, with its
+centroid) and `school_cluster_members` (`cds_code` → `cluster_id`).
+
+```bash
+python -m edtrawl.clustering --compare      # compare radii 0.1–0.75 mi (no DB writes)
+python -m edtrawl.clustering                # build at the default 0.4 mi radius and save
+python -m edtrawl.clustering --radius 0.25  # build at a different radius
+python -m edtrawl.clustering --osrm         # also split clusters by road drive time
+```
+
+- **Radius** (`--radius`, default 0.4 mi): schools within this distance of each
+  other are grouped (DBSCAN). A school with no neighbors is its own cluster.
+- **Span limit** (`--max-span`, default 0.75 mi): DBSCAN can chain schools into
+  a long cluster, so any cluster wider than this is split.
+- **Drive-time check** (`--osrm`, off by default): needs a self-hosted
+  [OSRM](https://project-osrm.org/) server (`--osrm-url`, default
+  `http://localhost:5000`). Splits clusters where two schools are more than
+  `--max-internal-minutes` (default 3) apart by road. If the server can't be
+  reached, the command stops with an error.
+
+Rebuilding replaces both tables, and cluster IDs can change between runs, so
+anything keyed on `cluster_id` should be recomputed after a rebuild.
 
 ## Note on scraping
 

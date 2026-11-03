@@ -7,6 +7,7 @@ dependencies = [
     "requests>=2.31",   # HTTP calls to geocoding / travel-time APIs
     # add more as you go, e.g. an LLM client for the fuzzy name-matching step
     "playwright>=1.40",
+    "scikit-learn>=1.5",  # DBSCAN / complete-linkage for school clustering (clustering.py)
 ]
 
 [project.optional-dependencies]

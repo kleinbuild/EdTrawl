@@ -41,6 +41,8 @@ Update: changed to python scripts for Playwright session capture and search scra
 
 3b. Implement `match.py`: `within_radius()` using the haversine function (already given), filtering schools to a candidate set before any API call. Test with a 30-mile radius from home; print the count of survivors.
 
+[x] 3b2. Cluster nearby schools (`clustering.py`) so travel time is computed once per cluster, not once per school. Run `python -m edtrawl.clustering --compare` to choose a radius, then build at that radius. Open question: should `travel_times` be keyed on `cluster_id` instead of `cds_code`? Cluster IDs change when clusters are rebuilt.
+
 [x] 3c. Pick a traffic-aware travel-time provider (Google Routes, TravelTime, or Amazon Location). Get an API key, add to `.env`.
 
 3d. Implement `travel_time.py`: `travel_minutes(home, school)` making two one-way requests (morning arrival, afternoon departure). Return `(arrive_min, depart_min)`.

@@ -8,7 +8,9 @@ Matrix Advanced, TravelTime, or Amazon Location — any provider that accepts a
 departure/arrival time and applies predictive traffic.
 
 Because you compute this once per school and cache it, your volume is tiny and
-should sit inside the free tier of any of them.
+should sit inside the free tier of any of them. clustering.py cuts it further:
+schools on the same campus/block share one cluster centroid, so `school` can be
+a cluster centroid (school_clusters.centroid_lat/lon) instead of each school.
 
 Planned shape:
     travel_minutes(home: tuple[float, float],

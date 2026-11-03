@@ -5,6 +5,8 @@
 #     schools_snapshots - annual updates of variable data  DONE
 #     travel_times   - cached minutes from home, per school (the expensive cache) 
 #     jobs           - job listings, linked to a school
+#     school_clusters / school_cluster_members - nearby schools grouped for
+#                      drive-time lookups (written by clustering.py) DONE
 
 import sqlite3
 from pathlib import Path

@@ -231,7 +231,30 @@ SCHEMA = [
         school_match_score REAL,
         school_match_status TEXT
     );
-    """ 
+    """,
+
+    # [Claude-written] School clusters: schools within a few hundred yards of
+    # each other (same campus / same block) collapsed into one point so drive
+    # times can be computed once per cluster. Filled by edtrawl/clustering.py;
+    # both tables are wiped and rebuilt on every run.
+    """
+    CREATE TABLE IF NOT EXISTS school_clusters (
+        cluster_id        INTEGER PRIMARY KEY,
+        centroid_lat      REAL,
+        centroid_lon      REAL,
+        n_schools         INTEGER,
+        max_span_miles    REAL
+    );
+    """,
+
+    """
+    CREATE TABLE IF NOT EXISTS school_cluster_members (
+        cds_code          TEXT PRIMARY KEY,
+        cluster_id        INTEGER,
+        FOREIGN KEY (cds_code) REFERENCES schools(cds_code),
+        FOREIGN KEY (cluster_id) REFERENCES school_clusters(cluster_id)
+    );
+    """
 ]
 
 def init_db() -> None:
@@ -417,6 +440,35 @@ def get_listings_needing_district_match() -> list:
     """
     with get_connection() as conn:
         return conn.execute(SQL).fetchall()
+
+# [Claude-written] Reads/writes for edtrawl/clustering.py
+def get_school_coordinates() -> list:
+    SQL = """
+        SELECT cds_code, latitude, longitude
+        FROM schools
+        ORDER BY cds_code
+    """
+    with get_connection() as conn:
+        return conn.execute(SQL).fetchall()
+
+def replace_school_clusters(clusters: list[tuple], members: list[tuple]) -> None:
+    """Replace both cluster tables in one transaction.
+
+    clusters: (cluster_id, centroid_lat, centroid_lon, n_schools, max_span_miles)
+    members:  (cds_code, cluster_id)
+    """
+    init_db()  # make sure the cluster tables exist on older databases
+    with get_connection() as conn:
+        conn.execute("DELETE FROM school_cluster_members")
+        conn.execute("DELETE FROM school_clusters")
+        conn.executemany(
+            "INSERT INTO school_clusters (cluster_id, centroid_lat, centroid_lon, n_schools, max_span_miles) VALUES (?, ?, ?, ?, ?)",
+            clusters,
+        )
+        conn.executemany(
+            "INSERT INTO school_cluster_members (cds_code, cluster_id) VALUES (?, ?)",
+            members,
+        )
 
 if __name__ == "__main__":
     # Running `python db.py` directly initializes the database.
